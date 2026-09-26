@@ -8,13 +8,13 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Handler;
 
+import com.netut.msb.R;
 import com.netut.msb.package_files.TreeCache;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 public class DownloadController {
-
     public interface Listener {
         void onTreeNeedsReload();
         void onStatus(String text);
@@ -56,7 +56,7 @@ public class DownloadController {
                     extractAndReload();
                 } else {
                     setBusy(false);
-                    notifyStatus("Download failed");
+                    notifyStatus(ctx.getString(R.string.sync_status_failed));
                     SoundDownloader.clearSavedId(ctx);
                 }
             }
@@ -92,7 +92,7 @@ public class DownloadController {
             case DownloadManager.STATUS_PENDING:
             case DownloadManager.STATUS_PAUSED:
                 setBusy(true);
-                notifyStatus("Resuming download…");
+                notifyStatus(ctx.getString(R.string.sync_status_resuming));
                 ui.post(dlPollTick);
                 break;
             case DownloadManager.STATUS_SUCCESSFUL:
@@ -107,12 +107,12 @@ public class DownloadController {
     public void start() {
         if (busy) return;
         setBusy(true);
-        notifyStatus("Connecting…");
+        notifyStatus(ctx.getString(R.string.sync_status_connecting));
 
         long id = SoundDownloader.start(ctx, owner, repo, branch);
         if (id == -1L) {
             setBusy(false);
-            notifyStatus("Cannot start download");
+            notifyStatus(ctx.getString(R.string.sync_status_cannot_start));
             return;
         }
         ui.post(dlPollTick);
@@ -139,18 +139,18 @@ public class DownloadController {
             switch (status) {
                 case DownloadManager.STATUS_RUNNING:
                 case DownloadManager.STATUS_PENDING:
-                    notifyStatus("Downloading… " + percent + "%");
+                    notifyStatus(ctx.getString(R.string.sync_status_downloading) + " " + percent + "%");
                     ui.postDelayed(this, 700);
                     break;
                 case DownloadManager.STATUS_PAUSED:
-                    notifyStatus("Paused… " + percent + "%");
+                    notifyStatus(ctx.getString(R.string.sync_status_paused) + " " + percent + "%");
                     ui.postDelayed(this, 1500);
                     break;
                 case DownloadManager.STATUS_SUCCESSFUL:
-                    notifyStatus("Downloaded 100%");
+                    notifyStatus(ctx.getString(R.string.sync_status_downloaded) + " 100%");
                     break;
                 case DownloadManager.STATUS_FAILED:
-                    notifyStatus("Download failed");
+                    notifyStatus(ctx.getString(R.string.sync_status_failed));
                     setBusy(false);
                     SoundDownloader.clearSavedId(ctx);
                     break;
@@ -162,7 +162,7 @@ public class DownloadController {
         if (extractInProgress) return;
         extractInProgress = true;
         setBusy(true);
-        notifyStatus("Extracting…");
+        notifyStatus(ctx.getString(R.string.sync_status_extracting));
 
         io.execute(() -> {
             try {
@@ -171,14 +171,14 @@ public class DownloadController {
                 ui.post(() -> {
                     extractInProgress = false;
                     setBusy(false);
-                    notifyStatus("Downloaded " + n + " files");
+                    notifyStatus(ctx.getString(R.string.sync_status_downloaded) + " " + n + " " + ctx.getString(R.string.sync_status_files_suffix));
                     if (listener != null) listener.onTreeNeedsReload();
                 });
             } catch (IOException ex) {
                 ui.post(() -> {
                     extractInProgress = false;
                     setBusy(false);
-                    notifyStatus("Extract failed: " + ex.getMessage());
+                    notifyStatus(ctx.getString(R.string.sync_status_extract_failed) + " " + ex.getMessage());
                 });
             }
         });

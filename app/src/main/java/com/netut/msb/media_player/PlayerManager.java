@@ -6,6 +6,8 @@ import android.media.MediaPlayer;
 import android.media.PlaybackParams;
 import android.util.Log;
 
+import com.netut.msb.R;
+
 import java.io.IOException;
 
 public class PlayerManager {
@@ -57,7 +59,7 @@ public class PlayerManager {
                 if (listener != null) listener.onPlaybackCompleted();
             });
             mp.setOnErrorListener((m, w, e) -> {
-                Log.e(TAG, "MediaPlayer error " + w + "/" + e);
+                Log.e(TAG, ctx.getString(R.string.player_error_media_player) + " " + w + "/" + e);
                 stopInternal();
                 if (listener != null) listener.onPlaybackStopped();
                 return true;
@@ -65,7 +67,7 @@ public class PlayerManager {
 
             if (listener != null) listener.onPlaybackStarted(name);
         } catch (IOException e) {
-            Log.e(TAG, "play failed: " + path, e);
+            Log.e(TAG, ctx.getString(R.string.player_error_play_failed) + " " + path, e);
             stopInternal();
         }
     }
@@ -102,7 +104,7 @@ public class PlayerManager {
             pp.setSpeed(pendingSpeed);
             mp.setPlaybackParams(pp);
         } catch (Exception e) {
-            Log.w(TAG, "setSpeed failed", e);
+            Log.w(TAG, ctx.getString(R.string.player_error_set_speed_failed) + " ", e);
         }
     }
 
@@ -116,13 +118,13 @@ public class PlayerManager {
         currentPath = null; currentName = null; paused = false;
     }
 
-    public boolean isPlaying()  { return mp != null && mp.isPlaying(); }
-    public boolean isPaused()   { return paused; }
-    public boolean hasTrack()   { return mp != null; }
-    public int  getCurrentPosition() { try { return mp == null ? 0 : mp.getCurrentPosition(); } catch (Exception e) { return 0; } }
-    public int  getDuration()        { try { return mp == null ? 0 : mp.getDuration();        } catch (Exception e) { return 0; } }
-    public String getCurrentPath() { return currentPath; }
-    public String getCurrentName() { return currentName; }
+    public boolean isPlaying() { return mp != null && mp.isPlaying();}
+    public boolean isPaused() { return paused;}
+    public boolean hasTrack() { return mp != null;}
+    public int  getCurrentPosition() {try {return mp == null ? 0 : mp.getCurrentPosition();} catch (Exception e) {return 0;}}
+    public int  getDuration() {try {return mp == null ? 0 : mp.getDuration();} catch (Exception e) {return 0;}}
+    public String getCurrentPath() {return currentPath;}
+    public String getCurrentName() {return currentName;}
 
     public void release() { stopInternal(); }
 }

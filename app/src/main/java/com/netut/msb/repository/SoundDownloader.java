@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
+import com.netut.msb.R;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,21 +30,17 @@ public class SoundDownloader {
         void onError(String message);
     }
 
-    // ────────────────────────────────────────────────────────────────────
-    // Старт загрузки
-    // ────────────────────────────────────────────────────────────────────
     public static long start(Context ctx, String owner, String repo, String branch) {
         cancel(ctx);
 
-        String url = "https://github.com/" + owner + "/" + repo
-                + "/archive/refs/heads/" + branch + ".zip";
+        String url = "https://github.com/" + owner + "/" + repo + "/archive/refs/heads/" + branch + ".zip";
 
         File zip = new File(ctx.getExternalFilesDir(null), ZIP_NAME);
         if (zip.exists()) zip.delete();
 
         DownloadManager.Request req = new DownloadManager.Request(Uri.parse(url));
-        req.setTitle("Minecraft Sounds");
-        req.setDescription("Downloading from GitHub…");
+        req.setTitle(ctx.getString(R.string.downloader_notification_title));
+        req.setDescription(ctx.getString(R.string.downloader_notification_description));
         req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         req.setDestinationInExternalFilesDir(ctx, null, ZIP_NAME);
         req.setAllowedOverMetered(true);
@@ -52,36 +50,27 @@ public class SoundDownloader {
         if (dm == null) return -1L;
 
         long id = dm.enqueue(req);
-        ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE)
-                .edit().putLong(KEY_ID, id).apply();
+        ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE).edit().putLong(KEY_ID, id).apply();
         Log.i(TAG, "enqueued id=" + id + " url=" + url);
         return id;
     }
 
     public static void cancel(Context ctx) {
-        long id = ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE)
-                .getLong(KEY_ID, -1L);
+        long id = ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE).getLong(KEY_ID, -1L);
         if (id != -1L) {
             DownloadManager dm = (DownloadManager) ctx.getSystemService(Context.DOWNLOAD_SERVICE);
             if (dm != null) dm.remove(id);
         }
-        ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE)
-                .edit().remove(KEY_ID).apply();
+        ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE).edit().remove(KEY_ID).apply();
     }
 
     public static long getSavedId(Context ctx) {
-        return ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE)
-                .getLong(KEY_ID, -1L);
+        return ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE).getLong(KEY_ID, -1L);
     }
 
     public static void clearSavedId(Context ctx) {
-        ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE)
-                .edit().remove(KEY_ID).apply();
+        ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE).edit().remove(KEY_ID).apply();
     }
-
-    // ────────────────────────────────────────────────────────────────────
-    // Прогресс
-    // ────────────────────────────────────────────────────────────────────
 
     public static int[] getProgress(Context ctx, long id) {
         DownloadManager dm = (DownloadManager) ctx.getSystemService(Context.DOWNLOAD_SERVICE);
@@ -99,12 +88,11 @@ public class SoundDownloader {
         }
     }
 
-    // ────────────────────────────────────────────────────────────────────
-    // Распаковка
-    // ────────────────────────────────────────────────────────────────────
     public static int extractSounds(Context ctx) throws IOException {
         File zip = new File(ctx.getExternalFilesDir(null), ZIP_NAME);
-        if (!zip.exists()) throw new IOException("ZIP not found: " + zip.getAbsolutePath());
+        if (!zip.exists()) {
+            throw new IOException(ctx.getString(R.string.downloader_error_zip_not_found, zip.getAbsolutePath()));
+        }
 
         File outRoot = new File(ctx.getFilesDir(), "sounds");
         if (outRoot.exists()) deleteRecursive(outRoot);
@@ -119,19 +107,16 @@ public class SoundDownloader {
             while ((e = zis.getNextEntry()) != null) {
                 String entryName = e.getName();
 
-                // В GitHub ZIP первый компонент пути = "repo-branch/"
                 int firstSlash = entryName.indexOf('/');
                 if (firstSlash < 0) continue;
                 String rel = entryName.substring(firstSlash + 1);
                 if (rel.isEmpty()) continue;
 
-                // Нас интересует только sounds/…
                 if (!rel.startsWith("sounds/")) continue;
                 String inner = rel.substring("sounds/".length());
                 if (inner.isEmpty()) continue;
 
                 File f = new File(outRoot, inner);
-                // защита от zip-slip
                 if (!f.getCanonicalPath().startsWith(outCanon)) continue;
 
                 if (e.isDirectory()) {
@@ -150,7 +135,6 @@ public class SoundDownloader {
             }
         }
 
-        // Удаляем zip, он больше не нужен
         zip.delete();
         clearSavedId(ctx);
         Log.i(TAG, "extracted " + count + " ogg files");

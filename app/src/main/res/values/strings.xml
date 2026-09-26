@@ -12,8 +12,9 @@
     <string name="mode_normal">Normal</string>
     <string name="mode_repeat">Repeat</string>
     <string name="mode_all">Play all</string>
-
     <string name="speed_title">Speed</string>
+    <string name="downloader_notification_title">Minecraft Sounds</string>
+    <string name="downloader_notification_description">Downloading from GitHub…</string>
 
     <string name="sync_title">Sounds source</string>
     <string name="sync_assets">Bundled (assets)</string>
@@ -22,4 +23,24 @@
     <string name="sync_done">Downloaded %1$d files</string>
     <string name="sync_error">Sync failed: %1$s</string>
     <string name="sync_confirm">Download sounds ZIP from GitHub and unpack locally?\n(Download continues in background.)</string>
+    <string name="sync_status_downloaded_files">Downloaded (files)</string>
+
+    <string name="sync_status_connecting">Connecting…</string>
+    <string name="sync_status_cannot_start">Cannot start download</string>
+    <string name="sync_status_downloading">Downloading…</string>
+    <string name="sync_status_paused">Paused…</string>
+    <string name="sync_status_downloaded">Downloaded</string>
+    <string name="sync_status_failed">Download failed</string>
+    <string name="sync_status_resuming">Resuming download…</string>
+    <string name="sync_status_extracting">Extracting…</string>
+    <string name="sync_status_extract_failed">Extract failed:</string>
+    <string name="sync_status_files_suffix">files</string>
+
+    <string name="downloader_error_zip_not_found">ZIP not found: %1$s</string>
+    <string name="player_error_media_player">Media Player error</string>
+    <string name="player_error_play_failed">play failed:</string>
+    <string name="player_error_set_speed_failed">setSpeed failed</string>
+    <string name="cache_error_save">save</string>
+    <string name="cache_error_load">load</string>
+    <string name="network_error_no_internet">No internet connection</string>
 </resources>

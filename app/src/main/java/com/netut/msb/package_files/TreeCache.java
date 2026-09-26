@@ -3,6 +3,8 @@ package com.netut.msb.package_files;
 import android.content.Context;
 import android.util.Log;
 
+import com.netut.msb.R;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +29,9 @@ public class TreeCache {
             try (FileWriter w = new FileWriter(new File(ctx.getFilesDir(), FILE_NAME))) {
                 w.write(o.toString());
             }
-        } catch (Exception e) { Log.e(TAG, "save", e); }
+        } catch (Exception e) {
+            Log.e(TAG, ctx.getString(R.string.cache_error_save), e);
+        }
     }
 
     public static SoundNode load(Context ctx, String sourceTag) {
@@ -43,7 +47,10 @@ public class TreeCache {
             if (o.optInt("version") != VERSION) return null;
             if (!sourceTag.equals(o.optString("source"))) return null;
             return fromJson(o.getJSONObject("root"), null);
-        } catch (Exception e) { Log.e(TAG, "load", e); return null; }
+        } catch (Exception e) {
+            Log.e(TAG, ctx.getString(R.string.cache_error_load), e);
+            return null;
+        }
     }
 
     public static void invalidate(Context ctx) {

@@ -1,5 +1,6 @@
 package com.netut.msb;
 
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -17,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -38,16 +40,12 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity
-        implements PlaybackController.PlaybackUi,
-        DownloadController.Listener {
+public class MainActivity extends AppCompatActivity implements PlaybackController.PlaybackUi, DownloadController.Listener {
 
-    // ─── Конфиг репозитория ──────────────────────────────────────────
     private static final String REPO_OWNER  = "Netut1";
     private static final String REPO_NAME   = "MSB_technical";
     private static final String REPO_BRANCH = "main";
 
-    // ─── Views ───────────────────────────────────────────────────────
     private RecyclerView list;
     private ProgressBar loading, progress;
     private TextView trackName, syncStatus;
@@ -56,21 +54,15 @@ public class MainActivity extends AppCompatActivity
     private LinearLayout sidePanel, speedRow;
     private TextView modeNormal, modeRepeat, modeAll, btnSync;
 
-    // ─── Состояние ───────────────────────────────────────────────────
     private SoundAdapter adapter;
     private SoundNode root;
     private boolean panelOpen = false;
 
-    // ─── Контроллеры ─────────────────────────────────────────────────
     private PlaybackController playback;
     private DownloadController download;
 
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private final Handler ui = new Handler(Looper.getMainLooper());
-
-    // ═════════════════════════════════════════════════════════════════
-    // Lifecycle
-    // ═════════════════════════════════════════════════════════════════
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,8 +74,7 @@ public class MainActivity extends AppCompatActivity
         applyInsets();
 
         playback = new PlaybackController(this, ui, this);
-        download = new DownloadController(this, io, ui, this,
-                REPO_OWNER, REPO_NAME, REPO_BRANCH);
+        download = new DownloadController(this, io, ui, this, REPO_OWNER, REPO_NAME, REPO_BRANCH);
 
         setupSearch();
         setupSidePanel();
@@ -104,10 +95,6 @@ public class MainActivity extends AppCompatActivity
         io.shutdownNow();
         playback.release();
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    // Views / Insets
-    // ═════════════════════════════════════════════════════════════════
 
     private void bindViews() {
         list         = findViewById(R.id.list);
@@ -145,23 +132,15 @@ public class MainActivity extends AppCompatActivity
         final int pBottom = playerPanel.getPaddingBottom();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (v, insets) -> {
-            Insets bars = insets.getInsets(
-                    WindowInsetsCompat.Type.systemBars()
-                            | WindowInsetsCompat.Type.displayCutout());
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
 
-            topBar.setPaddingRelative(tStart + bars.left, tTop + bars.top,
-                    tEnd + bars.right, topBar.getPaddingBottom());
+            topBar.setPaddingRelative(tStart + bars.left, tTop + bars.top, tEnd + bars.right, topBar.getPaddingBottom());
             content.setPadding(bars.left, 0, bars.right, 0);
-            playerPanel.setPaddingRelative(pStart + bars.left, pTop,
-                    pEnd + bars.right, pBottom + bars.bottom);
+            playerPanel.setPaddingRelative(pStart + bars.left, pTop, pEnd + bars.right, pBottom + bars.bottom);
 
             return insets;
         });
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    // Поиск
-    // ═════════════════════════════════════════════════════════════════
 
     private void setupSearch() {
         search.addTextChangedListener(new TextWatcher() {
@@ -172,10 +151,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    // Сайд-панель
-    // ═════════════════════════════════════════════════════════════════
 
     private void setupSidePanel() {
         btnMenu.setOnClickListener(v -> togglePanel());
@@ -204,9 +179,7 @@ public class MainActivity extends AppCompatActivity
         float w = 280 * d + 12 * d;
 
         if (panelOpen) {
-            sidePanel.animate().translationX(w).setDuration(180)
-                    .withEndAction(() -> sidePanel.setVisibility(View.GONE))
-                    .start();
+            sidePanel.animate().translationX(w).setDuration(180).withEndAction(() -> sidePanel.setVisibility(View.GONE)).start();
             panelOpen = false;
         } else {
             sidePanel.setVisibility(View.VISIBLE);
@@ -216,28 +189,19 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // ═════════════════════════════════════════════════════════════════
-    // Плеер + скорость
-    // ═════════════════════════════════════════════════════════════════
-
     private void setupPlayerButtons() {
         btnStop.setOnClickListener(v -> playback.stop());
         btnPlayPause.setOnClickListener(v -> playback.togglePlayPause());
     }
 
-    /**
-     * Строит кнопки скорости в 2 ряда: 4 в первом, остаток во втором.
-     * Во втором ряду добавляются пустые ячейки, чтобы ширина кнопок
-     * совпадала с первым рядом.
-     */
     private void setupSpeedChips() {
         speedRow.removeAllViews();
 
         float d = getResources().getDisplayMetrics().density;
         float[] speeds = playback.getSpeeds();
-        int gap = (int) (4 * d);              // зазор между кнопками
-        int perRow = 4;                       // 4 + 3 для 7 скоростей
-        int rowHeight = (int) (40 * d);       // как у mode_normal / mode_repeat
+        int gap = (int) (4 * d);
+        int perRow = 4;
+        int rowHeight = (int) (40 * d);
 
         int total = speeds.length;
         int rows = (total + perRow - 1) / perRow;
@@ -255,7 +219,6 @@ public class MainActivity extends AppCompatActivity
             int start = r * perRow;
             int end = Math.min(start + perRow, total);
 
-            // Реальные кнопки
             for (int i = start; i < end; i++) {
                 final float s = speeds[i];
                 String label = (s == Math.floor(s)
@@ -273,8 +236,7 @@ public class MainActivity extends AppCompatActivity
                 tv.setSingleLine(true);
                 tv.setSelected(s == playback.getSpeed());
 
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                        0, rowHeight, 1f);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, rowHeight, 1f);
                 if (i > start) lp.leftMargin = gap;
                 tv.setLayoutParams(lp);
 
@@ -287,11 +249,9 @@ public class MainActivity extends AppCompatActivity
                 row.addView(tv);
             }
 
-            // Пустые ячейки — чтобы ширина совпадала с первым рядом
             for (int i = end; i < start + perRow; i++) {
                 View spacer = new View(this);
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                        0, rowHeight, 1f);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, rowHeight, 1f);
                 lp.leftMargin = gap;
                 spacer.setLayoutParams(lp);
                 row.addView(spacer);
@@ -301,7 +261,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /** Сбрасывает выделение у всех кнопок скорости (учитывая 2 уровня вложенности). */
     private void resetChipSelection() {
         for (int r = 0; r < speedRow.getChildCount(); r++) {
             View rowView = speedRow.getChildAt(r);
@@ -312,10 +271,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    // PlaybackUi — обновление нижней панели
-    // ═════════════════════════════════════════════════════════════════
 
     @Override public void onTrackName(String name) {
         trackName.setText(name);
@@ -330,10 +285,6 @@ public class MainActivity extends AppCompatActivity
         progress.setMax(durationMs);
         progress.setProgress(currentMs);
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    // Дерево звуков
-    // ═════════════════════════════════════════════════════════════════
 
     private void loadTree() {
         loading.setVisibility(View.VISIBLE);
@@ -364,7 +315,7 @@ public class MainActivity extends AppCompatActivity
                     list.setAdapter(adapter);
                     loading.setVisibility(View.GONE);
                     syncStatus.setText(useFiles
-                            ? "Downloaded (files)"
+                            ? getString(R.string.sync_status_downloaded_files)
                             : getString(R.string.sync_assets));
                 });
             } catch (IOException e) {
@@ -378,10 +329,6 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    // ═════════════════════════════════════════════════════════════════
-    // DownloadListener — от DownloadController
-    // ═════════════════════════════════════════════════════════════════
-
     @Override public void onTreeNeedsReload() {
         loadTree();
     }
@@ -392,17 +339,13 @@ public class MainActivity extends AppCompatActivity
         btnSync.setEnabled(!busy);
     }
 
-    // ═════════════════════════════════════════════════════════════════
-    // Запуск синхронизации
-    // ═════════════════════════════════════════════════════════════════
-
     private void confirmSync() {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.sync_title)
                 .setMessage(R.string.sync_confirm)
                 .setPositiveButton(android.R.string.ok, (d, w) -> {
                     if (!isOnline()) {
-                        Toast.makeText(this, "No internet connection",
+                        Toast.makeText(this, getString(R.string.network_error_no_internet),
                                 Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -412,14 +355,24 @@ public class MainActivity extends AppCompatActivity
                 .show();
     }
 
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (panelOpen) {
+            sidePanel.setVisibility(View.GONE);
+            sidePanel.setTranslationX(0f);
+            panelOpen = false;
+        }
+        setupSpeedChips();
+    }
+
     private boolean isOnline() {
-        ConnectivityManager cm =
-                (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         if (cm == null) return false;
         Network n = cm.getActiveNetwork();
         if (n == null) return false;
         NetworkCapabilities caps = cm.getNetworkCapabilities(n);
-        return caps != null
-                && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+        return caps != null && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
     }
 }
