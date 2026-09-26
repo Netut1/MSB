@@ -119,7 +119,7 @@
                     android:text="@string/mode_normal"
                     android:textSize="12sp"
                     android:fontFamily="@font/monocraft"
-                    android:textColor="@drawable/mc_toggle_text"
+                    android:textColor="@color/mc_toggle_text"
                     android:background="@drawable/mc_button"
                     android:clickable="true"
                     android:focusable="true"/>
@@ -134,7 +134,7 @@
                     android:text="@string/mode_repeat"
                     android:textSize="12sp"
                     android:fontFamily="@font/monocraft"
-                    android:textColor="@drawable/mc_toggle_text"
+                    android:textColor="@color/mc_toggle_text"
                     android:background="@drawable/mc_button"
                     android:clickable="true"
                     android:focusable="true"/>
@@ -149,7 +149,7 @@
                     android:text="@string/mode_all"
                     android:textSize="12sp"
                     android:fontFamily="@font/monocraft"
-                    android:textColor="@drawable/mc_toggle_text"
+                    android:textColor="@color/mc_toggle_text"
                     android:background="@drawable/mc_button"
                     android:clickable="true"
                     android:focusable="true"/>
@@ -159,17 +159,18 @@
                 android:text="@string/speed_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="15dp"
                 android:textColor="@color/mc_text"
                 android:textSize="13sp"
                 android:fontFamily="@font/monocraft"/>
 
+            <!-- ⬇️ Вертикальный контейнер: сюда MainActivity построит 2 ряда кнопок -->
             <LinearLayout
                 android:id="@+id/speed_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"/>
 
             <TextView
                 android:text="@string/sync_title"

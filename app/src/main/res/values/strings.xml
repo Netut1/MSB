@@ -10,7 +10,7 @@
 
     <string name="mode_title">Playback mode</string>
     <string name="mode_normal">Normal</string>
-    <string name="mode_repeat">Repeat one</string>
+    <string name="mode_repeat">Repeat</string>
     <string name="mode_all">Play all</string>
 
     <string name="speed_title">Speed</string>
@@ -21,5 +21,5 @@
     <string name="sync_in_progress">Downloading… %1$d / %2$d</string>
     <string name="sync_done">Downloaded %1$d files</string>
     <string name="sync_error">Sync failed: %1$s</string>
-    <string name="sync_confirm">Download/refresh sounds from GitHub into internal storage?</string>
+    <string name="sync_confirm">Download sounds ZIP from GitHub and unpack locally?\n(Download continues in background.)</string>
 </resources>
