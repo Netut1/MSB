@@ -1,0 +1,3 @@
+[submodule "libs/MSB_technical"]
+	path = libs/MSB_technical
+	url = https://github.com/Netut1/MSB_technical
