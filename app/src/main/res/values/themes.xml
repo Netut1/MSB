@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.MSB" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/mc_green</item>
+        <item name="colorOnPrimary">#000000</item>
+        <item name="android:windowBackground">@color/mc_bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+        <item name="android:textColorPrimary">@color/mc_text</item>
+        <item name="android:textColorSecondary">@color/mc_text_dim</item>
+        <item name="android:fontFamily">@font/monocraft</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+    </style>
+</resources>

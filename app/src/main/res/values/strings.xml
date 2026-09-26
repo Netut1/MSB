@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MSB</string>
+    <string name="search_hint">Search sounds…</string>
+    <string name="no_track">-- nothing playing --</string>
+    <string name="cd_play">Play or pause</string>
+    <string name="cd_stop">Stop</string>
+    <string name="cd_menu">Menu</string>
+    <string name="loading_error">Error: %1$s</string>
+
+    <string name="mode_title">Playback mode</string>
+    <string name="mode_normal">Normal</string>
+    <string name="mode_repeat">Repeat one</string>
+    <string name="mode_all">Play all</string>
+
+    <string name="speed_title">Speed</string>
+
+    <string name="sync_title">Sounds source</string>
+    <string name="sync_assets">Bundled (assets)</string>
+    <string name="sync_github">Download from GitHub</string>
+    <string name="sync_in_progress">Downloading… %1$d / %2$d</string>
+    <string name="sync_done">Downloaded %1$d files</string>
+    <string name="sync_error">Sync failed: %1$s</string>
+    <string name="sync_confirm">Download/refresh sounds from GitHub into internal storage?</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="mc_bg">#2B2B2B</color>
+    <color name="mc_panel">#1E1E1E</color>
+    <color name="mc_btn_normal">#6B6B6B</color>
+    <color name="mc_btn_pressed">#4A4A4A</color>
+    <color name="mc_edge_light">#A8A8A8</color>
+    <color name="mc_edge_dark">#2A2A2A</color>
+    <color name="mc_border">#000000</color>
+    <color name="mc_text">#FFFFFF</color>
+    <color name="mc_text_dim">#A0A0A0</color>
+    <color name="mc_shadow">#3F3F3F</color>
+    <color name="mc_green">#5BC236</color>
+    <color name="mc_arrow">#E0E0E0</color>
+    <color name="mc_row_pressed">#4A6B4A</color>
+    <color name="mc_search_bg">#141414</color>
+</resources>
