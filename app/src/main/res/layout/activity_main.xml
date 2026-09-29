@@ -204,6 +204,57 @@
                 android:textColor="@color/mc_text_dim"
                 android:textSize="11sp"
                 android:fontFamily="@font/monocraft"/>
+
+            <TextView
+                android:text="@string/local_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/mc_text"
+                android:textSize="13sp"
+                android:fontFamily="@font/monocraft"/>
+
+            <TextView
+                android:id="@+id/btn_add_local"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="@string/local_add_button"
+                android:textColor="@color/mc_text"
+                android:textSize="13sp"
+                android:fontFamily="@font/monocraft"
+                android:background="@drawable/mc_button"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:id="@+id/btn_add_folder"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="@string/local_add_folder_button"
+                android:textColor="@color/mc_text"
+                android:textSize="13sp"
+                android:fontFamily="@font/monocraft"
+                android:background="@drawable/mc_button"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:id="@+id/btn_clear_local"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="@string/local_clear_button"
+                android:textColor="@color/mc_text"
+                android:textSize="13sp"
+                android:fontFamily="@font/monocraft"
+                android:background="@drawable/mc_button"
+                android:clickable="true"
+                android:focusable="true"/>
         </LinearLayout>
     </FrameLayout>
 

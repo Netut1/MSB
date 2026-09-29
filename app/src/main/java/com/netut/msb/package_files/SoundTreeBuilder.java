@@ -69,4 +69,43 @@ public class SoundTreeBuilder {
             parent.children.add(n);
         }
     }
+
+    public static SoundNode buildLocalTree(File root) {
+        SoundNode r = new SoundNode(SoundNode.Type.FOLDER, "local", "local");
+        walkLocalDir(root, r);
+        return r;
+    }
+
+    private static void walkLocalDir(File dir, SoundNode parent) {
+        File[] items = dir.listFiles();
+        if (items == null) return;
+        List<File> dirs = new ArrayList<>(), files = new ArrayList<>();
+        for (File f : items) {
+            if (f.isDirectory()) dirs.add(f);
+            else if (isAudioFile(f.getName())) files.add(f);
+        }
+        dirs.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+        files.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+
+        for (File d : dirs) {
+            SoundNode n = new SoundNode(SoundNode.Type.FOLDER, d.getName(), d.getAbsolutePath());
+            n.parent = parent;
+            parent.children.add(n);
+            walkLocalDir(d, n);
+        }
+        for (File f : files) {
+            String nm = f.getName();
+            int dot = nm.lastIndexOf('.');
+            String base = dot > 0 ? nm.substring(0, dot) : nm;
+            SoundNode n = new SoundNode(SoundNode.Type.SOUND, base, f.getAbsolutePath());
+            n.parent = parent;
+            parent.children.add(n);
+        }
+    }
+
+    public static boolean isAudioFile(String name) {
+        if (name == null) return false;
+        String lower = name.toLowerCase();
+        return lower.endsWith(".ogg") || lower.endsWith(".mp3");
+    }
 }

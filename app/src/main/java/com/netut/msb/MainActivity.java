@@ -4,6 +4,7 @@ import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,6 +19,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.netut.msb.repository.DownloadController;
 import com.netut.msb.repository.PlaybackController;
+import com.netut.msb.repository.LocalMusicManager;
 import com.netut.msb.media_player.SoundAdapter;
 import com.netut.msb.package_files.SoundNode;
 import com.netut.msb.package_files.SoundTreeBuilder;
@@ -39,6 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements PlaybackController.PlaybackUi, DownloadController.Listener {
 
@@ -64,6 +69,10 @@ public class MainActivity extends AppCompatActivity implements PlaybackControlle
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private final Handler ui = new Handler(Looper.getMainLooper());
 
+    private TextView btnAddLocal, btnAddFolder, btnClearLocal;
+    private ActivityResultLauncher<String[]>   localPicker;
+    private ActivityResultLauncher<Uri>        folderPicker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +84,14 @@ public class MainActivity extends AppCompatActivity implements PlaybackControlle
 
         playback = new PlaybackController(this, ui, this);
         download = new DownloadController(this, io, ui, this, REPO_OWNER, REPO_NAME, REPO_BRANCH);
+
+        localPicker = registerForActivityResult(
+                new ActivityResultContracts.OpenMultipleDocuments(),
+                uris -> { if (uris != null && !uris.isEmpty()) importLocalFiles(uris); });
+
+        folderPicker = registerForActivityResult(
+                new ActivityResultContracts.OpenDocumentTree(),
+                uri -> { if (uri != null) importLocalTree(uri); });
 
         setupSearch();
         setupSidePanel();
@@ -115,6 +132,9 @@ public class MainActivity extends AppCompatActivity implements PlaybackControlle
 
         list.setLayoutManager(new LinearLayoutManager(this));
         sidePanel.setVisibility(View.GONE);
+        btnAddLocal   = findViewById(R.id.btn_add_local);
+        btnAddFolder  = findViewById(R.id.btn_add_folder);
+        btnClearLocal = findViewById(R.id.btn_clear_local);
     }
 
     private void applyInsets() {
@@ -160,6 +180,9 @@ public class MainActivity extends AppCompatActivity implements PlaybackControlle
         modeAll   .setOnClickListener(v -> selectMode(PlaybackController.Mode.PLAY_ALL));
 
         btnSync.setOnClickListener(v -> confirmSync());
+        btnAddLocal  .setOnClickListener(v -> localPicker.launch(new String[]{"audio/*"}));
+        btnAddFolder .setOnClickListener(v -> folderPicker.launch(null));
+        btnClearLocal.setOnClickListener(v -> confirmClearLocal());
     }
 
     private void selectMode(PlaybackController.Mode m) {
@@ -307,6 +330,13 @@ public class MainActivity extends AppCompatActivity implements PlaybackControlle
                     TreeCache.save(this, built, sourceTag);
                 }
 
+                File localDir = LocalMusicManager.getLocalDir(this);
+                File[] localKids = localDir.listFiles();
+                if (localKids != null && localKids.length > 0) {
+                    SoundNode localNode = SoundTreeBuilder.buildLocalTree(localDir);
+                    built.children.add(localNode);
+                }
+
                 ui.post(() -> {
                     root = built;
                     adapter = new SoundAdapter(root,
@@ -350,6 +380,63 @@ public class MainActivity extends AppCompatActivity implements PlaybackControlle
                         return;
                     }
                     download.start();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void importLocalFiles(List<Uri> uris) {
+        Toast.makeText(this, getString(R.string.local_importing), Toast.LENGTH_SHORT).show();
+        io.execute(() -> {
+            try {
+                int n = LocalMusicManager.importFiles(this, uris);
+                ui.post(() -> {
+                    Toast.makeText(this,
+                            getString(R.string.local_added, n),
+                            Toast.LENGTH_SHORT).show();
+                    loadTree();
+                });
+            } catch (IOException e) {
+                ui.post(() -> Toast.makeText(this,
+                        getString(R.string.local_add_failed, e.getMessage()),
+                        Toast.LENGTH_LONG).show());
+            }
+        });
+    }
+
+    private void importLocalTree(Uri treeUri) {
+        Toast.makeText(this, getString(R.string.local_importing), Toast.LENGTH_SHORT).show();
+        io.execute(() -> {
+            try {
+                int n = LocalMusicManager.importTree(this, treeUri);
+                ui.post(() -> {
+                    Toast.makeText(this,
+                            getString(R.string.local_added, n),
+                            Toast.LENGTH_SHORT).show();
+                    loadTree();
+                });
+            } catch (IOException e) {
+                ui.post(() -> Toast.makeText(this,
+                        getString(R.string.local_add_failed, e.getMessage()),
+                        Toast.LENGTH_LONG).show());
+            }
+        });
+    }
+
+    private void confirmClearLocal() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.local_clear_title)
+                .setMessage(R.string.local_clear_confirm)
+                .setPositiveButton(android.R.string.ok, (d, w) -> {
+                    io.execute(() -> {
+                        int n = LocalMusicManager.clearAll(this);
+                        ui.post(() -> {
+                            Toast.makeText(this,
+                                    getString(R.string.local_cleared, n),
+                                    Toast.LENGTH_SHORT).show();
+                            loadTree();
+                        });
+                    });
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();

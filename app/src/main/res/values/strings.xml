@@ -43,4 +43,16 @@
     <string name="cache_error_save">save</string>
     <string name="cache_error_load">load</string>
     <string name="network_error_no_internet">No internet connection</string>
+
+    <!-- === Local music === -->
+    <string name="local_title">Local music</string>
+    <string name="local_add_button">Add local music</string>
+    <string name="local_add_folder_button">Add folder</string>
+    <string name="local_clear_button">Clear local</string>
+    <string name="local_importing">Importing…</string>
+    <string name="local_added">Added %1$d files</string>
+    <string name="local_add_failed">Import failed: %1$s</string>
+    <string name="local_clear_title">Clear local music</string>
+    <string name="local_clear_confirm">Delete all files from the local folder?\n(This cannot be undone.)</string>
+    <string name="local_cleared">Deleted %1$d files</string>
 </resources>
